@@ -35,13 +35,7 @@ public class TibberClient {
         GraphQLRequestEntity requestEntity = GraphQLRequestEntity.Builder()
                 .url(API_ENDPOINT)
                 .headers(headers)
-                // .arguments(new Arguments("Query", new Argument<String>("viewer", "")))
                 .arguments(new Arguments("viewer.home", new Argument<String>("id", homeId))).request(HomeRequest.class)
-                // .scalars(Boolean.class, Float.class, Integer.class)
-                /*
-                 * .variables(new Variable("timeFormat", "MM/dd/yyyy"))
-                 * .scalars(BigDecimal.class)
-                 */
                 .build();
         debugRequest(requestEntity);
 

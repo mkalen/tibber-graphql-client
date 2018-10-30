@@ -4,19 +4,20 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>se.kalen</groupId>
     <artifactId>tibber-graphql-client</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
     <name>Tibber GraphQL Client</name>
     <description>Tibber GraphSQL API Client</description>
 
     <properties>
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+        <tibber.graphql.model.version>0.2.0-SNAPSHOT</tibber.graphql.model.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>se.kalen</groupId>
             <artifactId>tibber-graphql-model</artifactId>
-            <version>0.1.1-SNAPSHOT</version>
+            <version>${tibber.graphql.model.version}</version>
         </dependency>
     </dependencies>
 

@@ -4,6 +4,9 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.aexp.nodes.graphql.Argument;
 import io.aexp.nodes.graphql.Arguments;
 import io.aexp.nodes.graphql.GraphQLRequestEntity;
@@ -21,6 +24,7 @@ public class TibberClient {
 
     private static final String API_ENDPOINT = "https://api.tibber.com/v1-beta/gql";
 
+    private final Logger logger = LoggerFactory.getLogger(TibberClient.class);
     private final String apiKey;
     private GraphQLTemplate graphQLTemplate;
 
@@ -45,29 +49,35 @@ public class TibberClient {
     }
 
     private void debugRequest(GraphQLRequestEntity requestEntity) {
-        System.out.println("Request:");
-        if (requestEntity == null) {
-            System.out.println("(null)");
+        if (!logger.isDebugEnabled()) {
+            return;
+        }
+        logger.debug("Request:");
+        if (requestEntity != null) {
+            logger.debug(" {}", requestEntity.getRequest());
         } else {
-            System.out.println(requestEntity.getRequest());
-
+            logger.debug(" (null)");
         }
     }
 
     private void debugResponse(GraphQLResponseEntity<?> responseEntity) {
-        System.out.println("Response:");
-        System.out.println(responseEntity);
-
-        if (responseEntity.getErrors() != null) {
-            for (io.aexp.nodes.graphql.internal.Error error : responseEntity.getErrors()) {
-                System.err.println("Error: " + error.getMessage());
-            }
+        if (!logger.isDebugEnabled()) {
+            return;
         }
-        if (responseEntity.getResponse() == null) {
-            System.out.println("(null)");
+        logger.debug("Response:");
+        if (responseEntity != null) {
+            if (responseEntity.getErrors() != null) {
+                for (io.aexp.nodes.graphql.internal.Error error : responseEntity.getErrors()) {
+                    logger.debug(" Error: {}", error.getMessage());
+                }
+            }
+            if (responseEntity.getResponse() != null) {
+                logger.debug(" Entity: {}", responseEntity.getResponse());
+            } else {
+                logger.debug(" Entity: (null)");
+            }
         } else {
-            System.out.println("Response");
-            System.out.println(responseEntity.getResponse().toString());
+            logger.debug("(null)");
         }
     }
 

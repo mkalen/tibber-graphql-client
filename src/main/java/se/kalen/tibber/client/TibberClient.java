@@ -1,6 +1,7 @@
 package se.kalen.tibber.client;
 
 import java.net.MalformedURLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,9 +15,9 @@ import io.aexp.nodes.graphql.GraphQLRequestEntity;
 import io.aexp.nodes.graphql.GraphQLRequestEntity.RequestBuilder;
 import io.aexp.nodes.graphql.GraphQLResponseEntity;
 import io.aexp.nodes.graphql.GraphQLTemplate;
+import no.tibber.api.model.Consumption;
 import no.tibber.api.model.ConsumptionResolution;
 import no.tibber.api.model.Home;
-import no.tibber.api.model.HomeWithConsumption;
 import no.tibber.api.model.query.HomeConsumptionRequest;
 import no.tibber.api.model.query.HomeRequest;
 import no.tibber.api.model.query.HomesRequest;
@@ -63,15 +64,22 @@ public class TibberClient {
         return responseEntity.getResponse().getHome();
     }
 
-    public HomeWithConsumption getHomeWithConsumption(String homeId, ConsumptionResolution resolution, int last) throws IllegalStateException, MalformedURLException {
+    public List<Consumption> getConsumptionFromEnd(String homeId, ConsumptionResolution resolution, int last) throws IllegalStateException, MalformedURLException {
+        return getConsumption(homeId,
+                new Argument<ConsumptionResolution>("resolution", resolution),
+                new Argument<Integer>("last", last),
+                new Argument<Boolean>("filterEmptyNodes", false)
+        );
+    }
+
+    private List<Consumption> getConsumption(String homeId, Argument<?> ... arguments) throws IllegalStateException, MalformedURLException {
         GraphQLRequestEntity requestEntity = getRequestBuilder() 
                 .arguments(
                         new Arguments("viewer.home",
                                 new Argument<String>("id", homeId)
                         ),
                         new Arguments("viewer.home.consumption",
-                                new Argument<ConsumptionResolution>("resolution", ConsumptionResolution.HOURLY),
-                                new Argument<Integer>("last", 100)
+                                arguments
                         ))
                 .request(HomeConsumptionRequest.class)
                 .build();
@@ -79,7 +87,10 @@ public class TibberClient {
 
         GraphQLResponseEntity<HomeConsumptionRequest> responseEntity = graphQLTemplate.query(requestEntity, HomeConsumptionRequest.class);
         debugResponse(responseEntity);
-        return (HomeWithConsumption) responseEntity.getResponse().getHome();
+        if (responseEntity != null && responseEntity.getResponse() != null && responseEntity.getResponse().getHome() != null) {
+            return responseEntity.getResponse().getHome().getConsumption().getNodes();
+        }
+        return Collections.emptyList();
     }
 
     private RequestBuilder getRequestBuilder() throws MalformedURLException {

@@ -64,6 +64,15 @@ public class TibberClient {
         return responseEntity.getResponse().getHome();
     }
 
+    public List<Consumption> getConsumption(String homeId, ConsumptionResolution resolution) throws IllegalStateException, MalformedURLException {
+        return getConsumption(homeId,
+                new Argument<ConsumptionResolution>("resolution", resolution),
+                new Argument<String>("after", "1990-01-01T00:00:00+01:00"),
+                new Argument<Integer>("first", 1),
+                new Argument<Boolean>("filterEmptyNodes", false)
+        );
+    }
+
     public List<Consumption> getConsumptionFromEnd(String homeId, ConsumptionResolution resolution, int last) throws IllegalStateException, MalformedURLException {
         return getConsumption(homeId,
                 new Argument<ConsumptionResolution>("resolution", resolution),
@@ -86,7 +95,6 @@ public class TibberClient {
         debugRequest(requestEntity);
 
         GraphQLResponseEntity<HomeConsumptionRequest> responseEntity = graphQLTemplate.query(requestEntity, HomeConsumptionRequest.class);
-        debugResponse(responseEntity);
         if (responseEntity != null && responseEntity.getResponse() != null && responseEntity.getResponse().getHome() != null) {
             return responseEntity.getResponse().getHome().getConsumption().getNodes();
         }

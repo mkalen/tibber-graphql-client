@@ -1,6 +1,8 @@
 package se.kalen.tibber.client;
 
 import java.net.MalformedURLException;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +23,7 @@ import no.tibber.api.model.Home;
 import no.tibber.api.model.query.HomeConsumptionRequest;
 import no.tibber.api.model.query.HomeRequest;
 import no.tibber.api.model.query.HomesRequest;
+import se.kalen.tibber.util.FormatUtil;
 
 /**
  * Java Client for Tibber GraphQL API.
@@ -73,6 +76,45 @@ public class TibberClient {
         );
     }
 
+    public List<Consumption> getConsumptionSince(String homeId, ConsumptionResolution resolution, OffsetDateTime since) throws IllegalStateException, MalformedURLException {
+        // TODO: How to filter directly in API? Contact Tibber regarding "after" parameter...
+        final List<Consumption> candidates = getConsumption(homeId,
+                new Argument<ConsumptionResolution>("resolution", resolution),
+                new Argument<String>("after", FormatUtil.toString(since)),
+                new Argument<Integer>("last", 100000),
+                new Argument<Boolean>("filterEmptyNodes", false)
+        );
+        final List<Consumption> result = new ArrayList<Consumption>();
+        for (final Consumption candidate : candidates) {
+            if (candidate != null && candidate.getFrom() != null && !candidate.getFrom().isBefore(since)) {
+                result.add(candidate);
+            }
+        }
+        return result;
+    }
+
+    public List<Consumption> getConsumptionSince(String homeId, ConsumptionResolution resolution,
+            OffsetDateTime since, OffsetDateTime until) throws IllegalStateException, MalformedURLException {
+        // TODO: How to filter directly in API? Contact Tibber regarding "after" parameter...
+        final List<Consumption> candidates = getConsumption(homeId,
+                new Argument<ConsumptionResolution>("resolution", resolution),
+                new Argument<String>("after", FormatUtil.toString(since)),
+                new Argument<Integer>("last", 100000),
+                new Argument<Boolean>("filterEmptyNodes", false)
+        );
+        final List<Consumption> result = new ArrayList<Consumption>();
+        for (final Consumption candidate : candidates) {
+            if (candidate != null
+                    && candidate.getFrom() != null
+                    && candidate.getTo() != null
+                    && !candidate.getFrom().isBefore(since)
+                    && (candidate.getTo().isBefore(until) || candidate.getTo().toInstant().equals(until.toInstant()))) {
+                result.add(candidate);
+            }
+        }
+        return result;
+    }
+
     public List<Consumption> getConsumptionFromEnd(String homeId, ConsumptionResolution resolution, int last) throws IllegalStateException, MalformedURLException {
         return getConsumption(homeId,
                 new Argument<ConsumptionResolution>("resolution", resolution),
@@ -95,7 +137,10 @@ public class TibberClient {
         debugRequest(requestEntity);
 
         GraphQLResponseEntity<HomeConsumptionRequest> responseEntity = graphQLTemplate.query(requestEntity, HomeConsumptionRequest.class);
-        if (responseEntity != null && responseEntity.getResponse() != null && responseEntity.getResponse().getHome() != null) {
+        if (responseEntity != null
+                && responseEntity.getResponse() != null
+                && responseEntity.getResponse().getHome() != null
+                && responseEntity.getResponse().getHome().getConsumption() != null) {
             return responseEntity.getResponse().getHome().getConsumption().getNodes();
         }
         return Collections.emptyList();

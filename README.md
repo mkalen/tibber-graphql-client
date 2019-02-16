@@ -1,6 +1,8 @@
-# Tibber GraphQL Java Model
+# Tibber GraphQL Java Client
 
-Java GraphQL client for [Tibber GraphQL API](https://developer.tibber.com/docs/overview) using [Nodes GraphQL library](https://github.com/americanexpress/nodes).
+A Java-client for the [Tibber energy company](https://sverige.tibber.com/)'s API.
+
+The client is a Java GraphQL client for the [Tibber GraphQL API](https://developer.tibber.com/docs/overview) and is built using the [Nodes GraphQL library](https://github.com/americanexpress/nodes).
 
 Depends on the [Tibber GraphQL Model](https://github.com/mkalen/tibber-graphql-model) library.
 

@@ -18,7 +18,7 @@ import io.aexp.nodes.graphql.GraphQLRequestEntity.RequestBuilder;
 import io.aexp.nodes.graphql.GraphQLResponseEntity;
 import io.aexp.nodes.graphql.GraphQLTemplate;
 import no.tibber.api.model.Consumption;
-import no.tibber.api.model.ConsumptionResolution;
+import no.tibber.api.model.EnergyResolution;
 import no.tibber.api.model.Home;
 import no.tibber.api.model.query.HomeConsumptionRequest;
 import no.tibber.api.model.query.HomeRequest;
@@ -67,19 +67,19 @@ public class TibberClient {
         return responseEntity.getResponse().getHome();
     }
 
-    public List<Consumption> getConsumption(String homeId, ConsumptionResolution resolution) throws IllegalStateException, MalformedURLException {
+    public List<Consumption> getConsumption(String homeId, EnergyResolution resolution) throws IllegalStateException, MalformedURLException {
         return getConsumption(homeId,
-                new Argument<ConsumptionResolution>("resolution", resolution),
+                new Argument<EnergyResolution>("resolution", resolution),
                 new Argument<String>("after", "1990-01-01T00:00:00+01:00"),
                 new Argument<Integer>("first", 1),
                 new Argument<Boolean>("filterEmptyNodes", false)
         );
     }
 
-    public List<Consumption> getConsumptionSince(String homeId, ConsumptionResolution resolution, OffsetDateTime since) throws IllegalStateException, MalformedURLException {
+    public List<Consumption> getConsumptionSince(String homeId, EnergyResolution resolution, OffsetDateTime since) throws IllegalStateException, MalformedURLException {
         // TODO: How to filter directly in API? Contact Tibber regarding "after" parameter...
         final List<Consumption> candidates = getConsumption(homeId,
-                new Argument<ConsumptionResolution>("resolution", resolution),
+                new Argument<EnergyResolution>("resolution", resolution),
                 new Argument<String>("after", FormatUtil.toString(since)),
                 new Argument<Integer>("last", 100000),
                 new Argument<Boolean>("filterEmptyNodes", false)
@@ -93,11 +93,11 @@ public class TibberClient {
         return result;
     }
 
-    public List<Consumption> getConsumptionSince(String homeId, ConsumptionResolution resolution,
+    public List<Consumption> getConsumptionSince(String homeId, EnergyResolution resolution,
             OffsetDateTime since, OffsetDateTime until) throws IllegalStateException, MalformedURLException {
         // TODO: How to filter directly in API? Contact Tibber regarding "after" parameter...
         final List<Consumption> candidates = getConsumption(homeId,
-                new Argument<ConsumptionResolution>("resolution", resolution),
+                new Argument<EnergyResolution>("resolution", resolution),
                 new Argument<String>("after", FormatUtil.toString(since)),
                 new Argument<Integer>("last", 100000),
                 new Argument<Boolean>("filterEmptyNodes", false)
@@ -115,9 +115,9 @@ public class TibberClient {
         return result;
     }
 
-    public List<Consumption> getConsumptionFromEnd(String homeId, ConsumptionResolution resolution, int last) throws IllegalStateException, MalformedURLException {
+    public List<Consumption> getConsumptionFromEnd(String homeId, EnergyResolution resolution, int last) throws IllegalStateException, MalformedURLException {
         return getConsumption(homeId,
-                new Argument<ConsumptionResolution>("resolution", resolution),
+                new Argument<EnergyResolution>("resolution", resolution),
                 new Argument<Integer>("last", last),
                 new Argument<Boolean>("filterEmptyNodes", false)
         );
